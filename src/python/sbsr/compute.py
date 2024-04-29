@@ -19,11 +19,27 @@ if consts.has_numba:
 
 
 def get_eval_info_times(_eval_num: int, _eval_fin: float):
-    return np.arange(0.0, _eval_fin * (1 + 1 / _eval_num), _eval_fin / _eval_num)
+    return np.asarray([x / (_eval_num - 1) * _eval_fin for x in range(_eval_num)])
 
 
 if consts.has_numba:
     get_eval_info_times = numba.njit(get_eval_info_times)
+
+
+def eval_final(sample: np.ndarray, num_var_pers=consts.DEF_NUM_VAR_PERS):
+    """
+    Get the parameterized final transform variable value for evaluating an empirical characteristic function
+
+    :param sample: sample to which to parameterize
+    :param num_var_pers: number of parameterization periods of the empirical characteristic function
+    :return:
+    """
+    v_stdev = np.std(sample)
+    return 1.0 if v_stdev == 0 else 2 * num_var_pers * np.pi / v_stdev
+
+
+if consts.has_numba:
+    eval_final = numba.njit(eval_final)
 
 
 def ecf_compare(_ecf_1: np.ndarray, _ecf_2: np.ndarray) -> float:
@@ -98,7 +114,7 @@ def _ecf_err(results: np.ndarray, num_steps: int, num_var_pers: int):
         err = 0.0
     else:
 
-        incr_max = 2 * num_var_pers * np.pi / np.std(results) / num_steps
+        incr_max = eval_final(results, num_var_pers) / num_steps
 
         eval_pts = _ecf_eval_pts(num_steps, incr_max)
         n = int(results.shape[0] / 2)
@@ -139,8 +155,7 @@ def _find_ecfs(_results: Dict[str, np.ndarray],
                num_var_pers: int):
     eval_fin = {}
     for k, v in _results.items():
-        v_stdev = np.std(v)
-        eval_fin[k] = 1.0 if v_stdev == 0 else 2 * num_var_pers * np.pi / v_stdev
+        eval_fin[k] = eval_final(v, num_var_pers)
     res_ecfs = {n: ecf(_results[n], get_eval_info_times(num_steps, eval_fin[n])) for n in _results.keys()}
     return idx, res_ecfs, eval_fin
 
@@ -472,6 +487,26 @@ def test_reproducibility(_results: Dict[str, np.ndarray],
         )
 
 
+def pvals(err_dist_mean: float, err_dist_stdev: float, err_compare: float, sample_size: int) -> float:
+    """
+    Calculate the p-value of an error metric from comparison to another sample for an error metric distribution
+    when testing a sample for reproducibility.
+
+    :param err_dist_mean: distribution of the error metric mean when testing for reproducibility
+    :param err_dist_stdev: distribution of the error metric standard deviation when testing for reproducibility
+    :param err_compare: error metric when comparing to another sample
+    :param sample_size: size of the sample
+    :return: p-value
+    """
+
+    if err_compare < err_dist_mean:
+        return 1.0
+    q2 = (sample_size + 1) / sample_size * err_dist_stdev * err_dist_stdev
+    lam2 = (err_compare - err_dist_mean) * (err_compare - err_dist_mean) / q2
+    pr = np.floor((sample_size + 1) / sample_size * ((sample_size - 1) / lam2 + 1)) / (sample_size + 1)
+    return min(1.0, pr)
+
+
 def pval(err_dist: np.ndarray, err_compare: float, sample_size: int) -> float:
     """
     Calculate the p-value of an error metric from comparison to another sample for an error metric distribution
@@ -483,10 +518,4 @@ def pval(err_dist: np.ndarray, err_compare: float, sample_size: int) -> float:
     :return: p-value
     """
 
-    err_avg = np.average(err_dist)
-    if err_compare < err_avg:
-        return 1.0
-    q2 = (sample_size + 1) / sample_size * np.var(err_dist, ddof=1)
-    lam2 = (err_compare - err_avg) * (err_compare - err_avg) / q2
-    pr = np.floor((sample_size + 1) / sample_size * ((sample_size - 1) / lam2 + 1)) / (sample_size + 1)
-    return min(1.0, pr)
+    return pvals(np.average(err_dist), np.std(err_dist, ddof=1), err_compare, sample_size)

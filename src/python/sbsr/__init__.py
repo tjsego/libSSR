@@ -1,4 +1,12 @@
-from .compute import get_eval_info_times, ecf_compare, ecf, err_sample, find_ecfs, test_reproducibility, pval
+from .compute import (get_eval_info_times,
+                      ecf_compare,
+                      ecf,
+                      err_sample,
+                      eval_final,
+                      find_ecfs,
+                      test_reproducibility,
+                      pval,
+                      pvals)
 from .data import SupportingData
 from .io import to_json, from_json, to_xml, from_xml
 from .par import get_pool, start_pool, close_pool
