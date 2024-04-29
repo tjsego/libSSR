@@ -29,6 +29,7 @@ if __name__ == '__main__':
     t_final = 2 * np.pi
     num_steps = 21
     var_name = 'Y'
+    eval_num = 100
 
     times = np.asarray([t_final * x / (num_steps - 1) for x in range(num_steps)], dtype=float)
 
@@ -39,6 +40,29 @@ if __name__ == '__main__':
     err_samples = {sz: sbsr.test_reproducibility({var_name: samples[sz]})[0] for sz in sizes_tested}
     err_means = {sz: np.mean(err_samples[sz]) for sz in sizes_tested}
     err_stdevs = {sz: np.std(err_samples[sz]) for sz in sizes_tested}
+    
+    # Generate supporting data
+    
+    size_export = int(sizes_tested[-1]/2)
+
+    sdata = sbsr.SupportingData()
+    sdata.level = sbsr.__sbsr_level__
+    sdata.version = sbsr.__sbsr_version__
+    sdata.variable_names = [var_name]
+    sdata.simulation_times = times
+    sdata.sample_size = size_export
+    sdata.ecf_evals = np.ndarray((num_steps, 1, eval_num, 2), dtype=float)
+    sdata.ecf_tval = np.ndarray((num_steps, 1), dtype=float)
+    for i in range(num_steps):
+        sample_i = samples[sizes_tested[-1]][:size_export, i]
+        sdata.ecf_tval[i, 0] = sbsr.eval_final(sample_i)
+        sdata.ecf_evals[i, 0, :, :] = sbsr.ecf(sample_i, sbsr.get_eval_info_times(eval_num, sdata.ecf_tval[i, 0]))
+    sdata.ecf_nval = eval_num
+    sdata.error_metric_mean = err_means[sizes_tested[-1]]
+    sdata.error_metric_stdev = err_stdevs[sizes_tested[-1]]
+    sdata.sig_figs = 8
+
+    sbsr.data.verify_data(sdata)
 
     # Simulate testing for reproduced results
 
@@ -48,7 +72,6 @@ if __name__ == '__main__':
 
     my_samples = {k: v[:int(k/2), :] for k, v in samples.items()}
     anothers_samples = {k: generate_sample(mean, stdev, int(k/2)) for k in sizes_tested}
-    eval_num = 100
     error_metrics = {sz: 0.0 for sz in sizes_tested}
     pvals = {sz: 0.0 for sz in sizes_tested}
 
@@ -74,6 +97,8 @@ if __name__ == '__main__':
             error_metrics_different[sz] = max(error_metrics_different[sz], sbsr.ecf_compare(my_ecf, anothers_ecf))
         pvals_different[sz] = sbsr.pvals(err_means[sz], err_stdevs[sz], error_metrics_different[sz], sz)
 
+    # Plot stuff
+
     fig, ax = plt.subplots(len(sizes_tested), 1, layout='compressed', figsize=(6.0, 1.5 * len(sizes_tested)), sharex=True)
     for i in range(len(sizes_tested)):
         sz = sizes_tested[i]
@@ -81,6 +106,7 @@ if __name__ == '__main__':
             ax[i].plot(times, samples[sz][j, :], color='gray', alpha=0.1)
         ax[i].set_ylabel(f'Sample size: {sz}')
     ax[-1].set_xlabel('Time')
+    fig.suptitle('Sample trajectories')
 
     fig, ax = plt.subplots(layout='compressed')
     ax.errorbar(sizes_tested, [err_means[sz] for sz in sizes_tested], yerr=[3 * err_stdevs[sz] for sz in sizes_tested], marker='o')
@@ -88,6 +114,7 @@ if __name__ == '__main__':
     ax.set_yscale('log')
     ax.set_xlabel('Sample size')
     ax.set_ylabel('Error metric')
+    fig.suptitle('Testing for reproducibility')
 
     fig, ax = plt.subplots(2, 1, sharex=True, layout='compressed')
     ax[0].plot(half_sizes_tested, [error_metrics[sz] for sz in sizes_tested], marker='o', label='Test: reproduced')
@@ -99,8 +126,9 @@ if __name__ == '__main__':
         axi.set_yscale('log')
     ax[0].legend()
     ax[0].set_ylabel('Error metric')
-    ax[1].set_ylabel('p-value')
+    ax[1].set_ylabel('Acceptance p-value')
     ax[1].set_xlabel('Sample size')
+    fig.suptitle('Testing for reproduced results (same distributions)')
 
     fig, ax = plt.subplots(2, 1, sharex=True, layout='compressed')
     ax[0].plot(half_sizes_tested, [error_metrics_different[sz] for sz in sizes_tested], marker='o', label='Test: reproduced')
@@ -112,7 +140,8 @@ if __name__ == '__main__':
         axi.set_yscale('log')
     ax[0].legend()
     ax[0].set_ylabel('Error metric')
-    ax[1].set_ylabel('p-value')
+    ax[1].set_ylabel('Acceptance p-value')
     ax[1].set_xlabel('Sample size')
+    fig.suptitle('Testing for reproduced results (different distributions)')
 
     plt.show()
