@@ -1,2 +1,2 @@
-# libSBSR
-Library for Stochastic Biological Simulation Reproducibility
+# libSSR
+Library for Stochastic Simulation Reproducibility
