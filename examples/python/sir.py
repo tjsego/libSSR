@@ -9,7 +9,8 @@ from matplotlib import pyplot as plt
 import numpy as np
 from roadrunner import RoadRunner
 
-import sbsr
+import libssr
+
 
 def antimony_to_sbml(model_string: str) -> str:
     antimony.clearPreviousLoads()
@@ -109,14 +110,14 @@ eval_t_all = {n: [0.0] * num_steps for n in model_names}
 
 for name in model_names:
     for i in range(num_steps):
-        eval_t_all[name][i] = sbsr.get_eval_info_times(num_evals, sbsr.eval_final(results_all[0][n][:, i].T[:], num_pers))
+        eval_t_all[name][i] = libssr.get_eval_info_times(num_evals, libssr.eval_final(results_all[0][name][:, i].T[:], num_pers))
 
 for j in range(len(results_all)):
     ecf_j = {}
     for name in model_names:
         ecf_n = np.ndarray((num_steps, num_evals, 2), dtype=float)
         for i in range(num_steps):
-            ecf_n[i, :, :] = sbsr.ecf(results_all[j][n][:, i].T, eval_t_all[name][i]).copy()
+            ecf_n[i, :, :] = libssr.ecf(results_all[j][name][:, i].T, eval_t_all[name][i]).copy()
         ecf_j[name] = ecf_n.copy()
     ecf_all.append(ecf_j)
 
@@ -128,7 +129,7 @@ for j, ecf_j in enumerate(ecf_all[1:]):
     for name in model_names:
         ecf_diff_name = 0.0
         for i in range(num_steps):
-            err_ij = sbsr.ecf_compare(ecf_all[0][name][i, :], ecf_j[name][i, :])
+            err_ij = libssr.ecf_compare(ecf_all[0][name][i, :], ecf_j[name][i, :])
             ecf_diff_name = max(ecf_diff_name, err_ij)
             if j == 1 and err_ij > err_max_val:
                 err_max_val = err_ij
@@ -162,7 +163,7 @@ ax[0].legend(dist_labels)
 
 fig, ax = plt.subplots(3, len(model_names), figsize=(8.0, 4.0), layout='compressed', sharex='col')
 for i, name in enumerate(model_names):
-    eval_t = sbsr.get_eval_info_times(num_evals, sbsr.eval_final(results_all[0][name][:, err_max_idx].T, num_pers))
+    eval_t = libssr.get_eval_info_times(num_evals, libssr.eval_final(results_all[0][name][:, err_max_idx].T, num_pers))
     
     for j, ecf_j in enumerate(ecf_all):
         ax[0][i].plot(eval_t, ecf_j[name][err_max_idx, :, 0], label=dist_labels[j])

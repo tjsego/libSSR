@@ -4,16 +4,16 @@ from typing import List
 
 class SupportingData:
     """
-    SBSR supporting data
+    SSR supporting data
     """
 
     def __init__(self):
 
         self.level: int = 0
-        """SBSR level"""
+        """SSR level"""
 
         self.version: int = 0
-        """SBSR version"""
+        """SSR version"""
 
         self.variable_names: List[str] = []
         """Variable names"""

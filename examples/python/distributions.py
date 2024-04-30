@@ -8,7 +8,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 from scipy.stats.sampling import NumericalInversePolynomial
 
-import sbsr
+import libssr
 
 
 def as_si(x, ndp):
@@ -121,17 +121,17 @@ if __name__ == '__main__':
     eval_num = 100
     eval_per = 3
     eval_fin = 2 * eval_per * np.pi / np.sqrt(variance)
-    eval_t = sbsr.get_eval_info_times(eval_num, eval_fin)
+    eval_t = libssr.get_eval_info_times(eval_num, eval_fin)
 
-    ecf_norm = sbsr.ecf(sample_norm, eval_t)
-    ecf_lplc = sbsr.ecf(sample_lplc, eval_t)
-    ecf_ufrm = sbsr.ecf(sample_ufrm, eval_t)
-    ecf_lgsc = sbsr.ecf(sample_lgsc, eval_t)
+    ecf_norm = libssr.ecf(sample_norm, eval_t)
+    ecf_lplc = libssr.ecf(sample_lplc, eval_t)
+    ecf_ufrm = libssr.ecf(sample_ufrm, eval_t)
+    ecf_lgsc = libssr.ecf(sample_lgsc, eval_t)
 
-    ecf_norm_2 = sbsr.ecf(sample_norm_2, eval_t)
-    ecf_lplc_2 = sbsr.ecf(sample_lplc_2, eval_t)
-    ecf_ufrm_2 = sbsr.ecf(sample_ufrm_2, eval_t)
-    ecf_lgsc_2 = sbsr.ecf(sample_lgsc_2, eval_t)
+    ecf_norm_2 = libssr.ecf(sample_norm_2, eval_t)
+    ecf_lplc_2 = libssr.ecf(sample_lplc_2, eval_t)
+    ecf_ufrm_2 = libssr.ecf(sample_ufrm_2, eval_t)
+    ecf_lgsc_2 = libssr.ecf(sample_lgsc_2, eval_t)
 
     ecf_all = [ecf_norm, ecf_lplc, ecf_ufrm, ecf_lgsc]
     ecf_all_2 = [ecf_norm_2, ecf_lplc_2, ecf_ufrm_2, ecf_lgsc_2]
@@ -140,7 +140,7 @@ if __name__ == '__main__':
 
     for i, ecf_i in enumerate(ecf_all):
         for j, ecf_j in enumerate(ecf_all_2):
-            err_mat[i, j] = sbsr.ecf_compare(ecf_i, ecf_j)
+            err_mat[i, j] = libssr.ecf_compare(ecf_i, ecf_j)
 
     fig_hm, ax_hm = plt.subplots()
     im = ax_hm.imshow(err_mat, cmap='rainbow')

@@ -8,7 +8,7 @@ from .data import SupportingData, verify_data
 ######################
 # Example XML format #
 ######################
-# <sbsr level="0" version="0">
+# <ssr level="0" version="0">
 #   <variableNames>
 #       <name>S</name>
 #   </variableNames>
@@ -34,7 +34,7 @@ from .data import SupportingData, verify_data
 #   <errorMetricMean>0.001</errorMetricMean>
 #   <errorMetricStDev>0.0005</errorMetricStDev>
 #   <numberOfSigFigs>6</numberOfSigFigs>
-# </sbsr>
+# </ssr>
 ######################
 
 
@@ -45,7 +45,7 @@ def to_xml(inst: SupportingData):
     :param inst: supporting data instance
     :return: XML root element
     """
-    el_root = ElementTree.Element('sbsr',
+    el_root = ElementTree.Element('ssr',
                                   dict(level=str(inst.level),
                                        version=str(inst.version)))
 
