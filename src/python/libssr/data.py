@@ -1,4 +1,5 @@
 # todo: add YAML implementation using PyYAML
+# todo: add support for optional parameter distribution specification using ProbOnto
 
 import numpy as np
 from typing import List, Optional
@@ -138,6 +139,53 @@ class SupportingData:
 
         self.sig_figs: int = 0
         """Significant figures of sample data"""
+
+    @classmethod
+    def create(cls,
+               variable_names: List[str],
+               simulation_times: np.ndarray,
+               sample_size: int,
+               ecf_evals: np.ndarray,
+               ecf_tval: np.ndarray,
+               ecf_nval: int,
+               error_metric_mean: float,
+               error_metric_stdev: float,
+               sig_figs: int):
+        """
+        Create an instance
+
+        :param variable_names: Variable names
+        :param simulation_times: Simulation times (1D float array)
+        :param sample_size: Size of sample
+        :param ecf_evals: ECF evaluations
+            - dim 0 is by simulation time
+            - dim 1 is by variable name
+            - dim 2 is by transform variable evaluation
+            - dim 3 is real/imaginary
+        :param ecf_tval: ECF transform variable final value
+            - dim 0 is by simulation time
+            - dim 1 is by variable name
+        :param ecf_nval: Number of ECF evaluations per time and name
+        :param error_metric_mean: Error metric mean, from test for reproducibility
+        :param error_metric_stdev: Error metric standard deviation, from test for reproducibility
+        :param sig_figs: Significant figures of sample data
+        :return: verified instance
+        :raises ValueError: if any instance data is incomplete or incorrect
+        """
+        from libssr import __ssr_level__, __ssr_version__
+        inst = SupportingData()
+        inst.level = __ssr_level__
+        inst.version = __ssr_version__
+        inst.variable_names = variable_names
+        inst.simulation_times = simulation_times
+        inst.sample_size = sample_size
+        inst.ecf_evals = ecf_evals
+        inst.ecf_tval = ecf_tval
+        inst.ecf_nval = ecf_nval
+        inst.error_metric_mean = error_metric_mean
+        inst.error_metric_stdev = error_metric_stdev
+        inst.sig_figs = sig_figs
+        return verify_data(inst)
 
     def to_xml(self):
         """
@@ -436,44 +484,38 @@ def verify_data(inst: SupportingData):
 
 def test_instance() -> SupportingData:
     """Generate a test instance"""
-    inst = SupportingData()
-    inst.variable_names = ['S']
-    inst.simulation_times = np.asarray([0.0, 1.0], dtype=float)
-    inst.sample_size = 1000
-    inst.ecf_evals = np.asarray(
-        [
-            [
-                [(1.0, 0.0), (0.5, 0.5), (0.1, 0.1)]
-            ],
-            [
-                [(1.0, 0.0), (0.2, 0.6), (0.2, 0.3)]
-            ]
-        ],
-        dtype=float
-    )
-    inst.ecf_tval = np.asarray(
-        [
-            [
-                10.0
-            ],
-            [
-                20.0
-            ]
-        ],
-        dtype=float
-    )
-    inst.ecf_nval = 3
-    inst.error_metric_mean = 0.001
-    inst.error_metric_stdev = 0.0005
-    inst.sig_figs = 6
 
-    if inst.verify():
-        print('Test instance verified')
-    else:
-        print('Test instance failed with the following message:')
-        print(inst.error_info())
-
-    return inst
+    return SupportingData.create(
+            variable_names=['S'],
+            simulation_times=np.asarray([0.0, 1.0], dtype=float),
+            sample_size=1000,
+            ecf_evals=np.asarray(
+                [
+                    [
+                        [(1.0, 0.0), (0.5, 0.5), (0.1, 0.1)]
+                    ],
+                    [
+                        [(1.0, 0.0), (0.2, 0.6), (0.2, 0.3)]
+                    ]
+                ],
+                dtype=float
+            ),
+            ecf_tval=np.asarray(
+                [
+                    [
+                        10.0
+                    ],
+                    [
+                        20.0
+                    ]
+                ],
+                dtype=float
+            ),
+            ecf_nval=3,
+            error_metric_mean=0.001,
+            error_metric_stdev=0.0005,
+            sig_figs=6
+        )
 
 
 def test():
