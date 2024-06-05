@@ -7,8 +7,12 @@ __version__ = open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(
 setup(
     name='libssr',
     version=__version__,
-    description='Library for Stochastic Simulation Reproducibility',
+    description='A library for stochastic simulation reproducibility',
     author="T.J. Sego",
     author_email="timothy.sego@medicine.ufl.edu",
-    install_requires=['numpy']
+    python_requires='>=3.8',
+    install_requires=['numpy'],
+    packages=['libssr'],
+    package_dir={'libssr': 'libssr'},
+    package_data={'libssr': ['../../LICENSE', '../../VERSION.txt']}
 )

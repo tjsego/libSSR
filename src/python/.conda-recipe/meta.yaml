@@ -1,0 +1,35 @@
+package:
+  name: libssr
+  version: 0.0.0
+
+about:
+  home: https://github.com/tjsego/libSSR
+  license: MIT
+  license_file: ../../LICENSE
+  summary: A library for stochastic simulation reproducibility
+
+extra:
+  maintainers: tjsego
+
+source:
+  path: ../
+
+build:
+  number: 0
+  noarch: python
+  include_recipe: False
+  script: python setup.py install --single-version-externally-managed --record=record.txt
+
+requirements:
+  host:
+    - python >= 3.8
+    - numpy
+    - setuptools
+
+  run:
+    - python
+    - {{ pin_compatible('numpy') }}
+
+  test:
+    imports:
+      - libssr
