@@ -45,24 +45,24 @@ if __name__ == '__main__':
     
     size_export = int(sizes_tested[-1]/2)
 
-    sdata = libssr.SupportingData()
-    sdata.level = libssr.__ssr_level__
-    sdata.version = libssr.__ssr_version__
-    sdata.variable_names = [var_name]
-    sdata.simulation_times = times
-    sdata.sample_size = size_export
-    sdata.ecf_evals = np.ndarray((num_steps, 1, eval_num, 2), dtype=float)
-    sdata.ecf_tval = np.ndarray((num_steps, 1), dtype=float)
+    ecf_evals = np.ndarray((num_steps, 1, eval_num, 2), dtype=float)
+    ecf_tval = np.ndarray((num_steps, 1), dtype=float)
     for i in range(num_steps):
         sample_i = samples[sizes_tested[-1]][:size_export, i]
-        sdata.ecf_tval[i, 0] = libssr.eval_final(sample_i)
-        sdata.ecf_evals[i, 0, :, :] = libssr.ecf(sample_i, libssr.get_eval_info_times(eval_num, sdata.ecf_tval[i, 0]))
-    sdata.ecf_nval = eval_num
-    sdata.error_metric_mean = err_means[sizes_tested[-1]]
-    sdata.error_metric_stdev = err_stdevs[sizes_tested[-1]]
-    sdata.sig_figs = 8
+        ecf_tval[i, 0] = libssr.eval_final(sample_i)
+        ecf_evals[i, 0, :, :] = libssr.ecf(sample_i, libssr.get_eval_info_times(eval_num, ecf_tval[i, 0]))
 
-    libssr.data.verify_data(sdata)
+    sdata = libssr.SupportingData.create(
+        variable_names=[var_name],
+        simulation_times=times,
+        sample_size=size_export,
+        ecf_evals=ecf_evals,
+        ecf_tval=ecf_tval,
+        ecf_nval=eval_num,
+        error_metric_mean=err_means[sizes_tested[-1]],
+        error_metric_stdev=err_stdevs[sizes_tested[-1]],
+        sig_figs=8
+    )
 
     # Simulate testing for reproduced results
 
