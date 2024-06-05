@@ -369,6 +369,9 @@ class SupportingData:
 
         return inst
 
+    def __reduce__(self):
+        return SupportingData.from_json, (self.to_json(),)
+
     def verify(self) -> bool:
         """
         Verify completeness and accuracy of data.
