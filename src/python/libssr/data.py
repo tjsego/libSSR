@@ -1,7 +1,7 @@
 # todo: add YAML implementation using PyYAML
 
 import numpy as np
-from typing import List
+from typing import List, Optional
 from xml.etree import ElementTree
 
 
@@ -369,6 +369,33 @@ class SupportingData:
 
         return inst
 
+    def verify(self) -> bool:
+        """
+        Verify completeness and accuracy of data.
+
+        This is a soft test.
+
+        :return: True if verified, otherwise False
+        """
+
+        try:
+            verify_data(self)
+            return True
+        except ValueError:
+            return False
+
+    def error_info(self) -> Optional[str]:
+        """
+        Return error information, if any
+
+        :return: Error information, if any. Otherwise None
+        """
+        try:
+            verify_data(self)
+            return None
+        except ValueError as err:
+            return str(err)
+
 
 def verify_data(inst: SupportingData):
     """
@@ -437,7 +464,13 @@ def test_instance() -> SupportingData:
     inst.error_metric_stdev = 0.0005
     inst.sig_figs = 6
 
-    return verify_data(inst)
+    if inst.verify():
+        print('Test instance verified')
+    else:
+        print('Test instance failed with the following message:')
+        print(inst.error_info())
+
+    return inst
 
 
 def test():
