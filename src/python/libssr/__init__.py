@@ -7,7 +7,7 @@ from .compute import (get_eval_info_times,
                       test_reproducibility,
                       pval,
                       pvals)
-from .data import SupportingData
+from .data import EFECTReport
 from .par import get_pool, start_pool, close_pool
 from .utils import round_to_sigfigs, round_arr_to_sigfigs
 

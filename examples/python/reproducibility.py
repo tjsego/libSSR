@@ -9,6 +9,7 @@ import numpy as np
 
 import libssr
 
+
 def generate_sample(_mean: float, _stdev: float, _size: int):
     result = np.ndarray((_size, num_steps), dtype=float)
     offset = np.random.normal(_mean, _stdev, _size)
@@ -52,7 +53,7 @@ if __name__ == '__main__':
         ecf_tval[i, 0] = libssr.eval_final(sample_i)
         ecf_evals[i, 0, :, :] = libssr.ecf(sample_i, libssr.get_eval_info_times(eval_num, ecf_tval[i, 0]))
 
-    sdata = libssr.SupportingData.create(
+    sdata = libssr.EFECTReport.create(
         variable_names=[var_name],
         simulation_times=times,
         sample_size=size_export,

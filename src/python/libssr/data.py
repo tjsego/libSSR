@@ -88,7 +88,7 @@ from xml.etree import ElementTree
 #######################
 
 
-class SupportingData:
+class EFECTReport:
     """
     SSR supporting data
     """
@@ -173,7 +173,7 @@ class SupportingData:
         :raises ValueError: if any instance data is incomplete or incorrect
         """
         from libssr import __ssr_level__, __ssr_version__
-        inst = SupportingData()
+        inst = EFECTReport()
         inst.level = __ssr_level__
         inst.version = __ssr_version__
         inst.variable_names = variable_names
@@ -418,7 +418,7 @@ class SupportingData:
         return inst
 
     def __reduce__(self):
-        return SupportingData.from_json, (self.to_json(),)
+        return EFECTReport.from_json, (self.to_json(),)
 
     def verify(self) -> bool:
         """
@@ -448,7 +448,7 @@ class SupportingData:
             return str(err)
 
 
-def verify_data(inst: SupportingData):
+def verify_data(inst: EFECTReport):
     """
     Verify an instance
 
@@ -482,10 +482,10 @@ def verify_data(inst: SupportingData):
     return inst
 
 
-def test_instance() -> SupportingData:
+def test_instance() -> EFECTReport:
     """Generate a test instance"""
 
-    return SupportingData.create(
+    return EFECTReport.create(
             variable_names=['S'],
             simulation_times=np.asarray([0.0, 1.0], dtype=float),
             sample_size=1000,
@@ -525,12 +525,12 @@ def test():
     inst = test_instance()
 
     el_xml = inst.to_xml()
-    verify_data(SupportingData.from_xml(el_xml))
+    verify_data(EFECTReport.from_xml(el_xml))
     dom = minidom.parseString(ElementTree.tostring(el_xml))
     print(dom.toprettyxml())
 
     data_json = inst.to_json()
-    verify_data(SupportingData.from_json(data_json))
+    verify_data(EFECTReport.from_json(data_json))
     print(data_json)
 
 
