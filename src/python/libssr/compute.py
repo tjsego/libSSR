@@ -1,7 +1,7 @@
 import multiprocessing as mp
 from multiprocessing import shared_memory
 import numpy as np
-from typing import Dict
+from typing import Dict, List
 
 from . import consts
 from . import par
@@ -10,16 +10,8 @@ if consts.has_numba:
     import numba
 
 
-def _ecf_eval_pts(num_steps: int, incr: float) -> np.ndarray:
-    return np.arange(0.0, (num_steps+1) * incr, incr)
-
-
-if consts.has_numba:
-    _ecf_eval_pts = numba.njit(_ecf_eval_pts)
-
-
 def get_eval_info_times(_eval_num: int, _eval_fin: float):
-    return np.asarray([x / (_eval_num - 1) * _eval_fin for x in range(_eval_num)])
+    return np.linspace(0.0, _eval_fin, _eval_num)
 
 
 if consts.has_numba:
@@ -109,14 +101,16 @@ if consts.has_numba:
 
 
 def _ecf_err(results: np.ndarray, num_steps: int, num_var_pers: int):
-    if np.std(results) == 0.0:
+    res_std = np.std(results)
+    if res_std == 0.0:
         incr_max = 1 / num_steps
         err = 0.0
     else:
 
-        incr_max = eval_final(results, num_var_pers) / num_steps
+        eval_t_fin = 2 * num_var_pers * np.pi / res_std
+        incr_max = eval_t_fin / num_steps
 
-        eval_pts = _ecf_eval_pts(num_steps, incr_max)
+        eval_pts = get_eval_info_times(num_steps, eval_t_fin)
         n = int(results.shape[0] / 2)
         ecf1 = ecf(results[:n], eval_pts)
         ecf2 = ecf(results[n:], eval_pts)
@@ -127,6 +121,27 @@ def _ecf_err(results: np.ndarray, num_steps: int, num_var_pers: int):
 
 if consts.has_numba:
     _ecf_err = numba.njit(_ecf_err)
+
+
+def _ecf_err_s(results: np.ndarray, num_steps: int, num_var_pers: int):
+    res_std = np.std(results)
+    if res_std == 0.0:
+        err = 0.0
+    else:
+
+        eval_t_fin = 2 * num_var_pers * np.pi / res_std
+
+        eval_pts = get_eval_info_times(num_steps, eval_t_fin)
+        n = int(results.shape[0] / 2)
+        ecf1 = ecf(results[:n], eval_pts)
+        ecf2 = ecf(results[n:], eval_pts)
+        err = ecf_compare(ecf1, ecf2)
+
+    return err
+
+
+if consts.has_numba:
+    _ecf_err = numba.njit(_ecf_err_s)
 
 
 def err_sample(_results: Dict[str, np.ndarray],
@@ -205,17 +220,51 @@ def find_ecfs(_results: Dict[str, np.ndarray],
 
 
 def _test_sampling_impl_shared(_results: np.ndarray,
+                               _indices: np.ndarray,
+                               _hsize: int,
                                _num_times: int,
                                _num_steps: int,
                                _num_var_pers: int):
-    err_iter = 0.0
+    err = np.zeros((_num_times,))
     for idx in range(_num_times):
-        err_iter = max(err_iter, _ecf_err(_results[:, idx].T, _num_steps, _num_var_pers)[1])
-    return err_iter
+        res_std = np.std(_results[:, idx])
+        if res_std == 0.0:
+            continue
+
+        eval_t_fin = 2.0 * _num_var_pers * np.pi / res_std
+        eval_pts = get_eval_info_times(_num_steps, eval_t_fin)
+        ecf1 = ecf(_results[_indices[:_hsize], idx], eval_pts)
+        ecf2 = ecf(_results[_indices[_hsize:], idx], eval_pts)
+        err[idx] = ecf_compare(ecf1, ecf2)
+    return np.max(err)
 
 
 if consts.has_numba:
     _test_sampling_impl_shared = numba.njit(_test_sampling_impl_shared)
+
+
+def _test_sampling_shared_(results: List[np.ndarray],
+                           indices: np.ndarray,
+                           num_results: int,
+                           num_times: int,
+                           num_steps: int,
+                           num_var_pers: int):
+
+    out_arr = np.zeros((num_results,), dtype=float)
+    hsize = results[0].shape[0] // 2
+
+    for i in range(num_results):
+        np.random.shuffle(indices)
+        err = 0.0
+        for res in results:
+            err = max(err, _test_sampling_impl_shared(res, indices, hsize, num_times, num_steps, num_var_pers))
+        out_arr[i] = err
+
+    return out_arr
+
+
+if consts.has_numba:
+    _test_sampling_shared_ = numba.njit(_test_sampling_shared_)
 
 
 def _test_sampling_shared(_shm_in_info: Dict[str, str],
@@ -233,19 +282,11 @@ def _test_sampling_shared(_shm_in_info: Dict[str, str],
     shm_in = {k: shared_memory.SharedMemory(name=v) for k, v in _shm_in_info.items()}
     shm_out = shared_memory.SharedMemory(name=_shm_out_info)
 
-    _results = {k: np.ndarray((_arr_shape0, _arr_shape1), dtype=float, buffer=v.buf) for k, v in shm_in.items()}
     shm_out_arr = np.ndarray((_shm_out_len,), dtype=float, buffer=shm_out.buf)
-    out_arr = np.zeros((_num_results,), dtype=float)
-    results_copy = [np.array(v) for v in _results.values()]
+    _results = [np.ndarray((_arr_shape0, _arr_shape1), dtype=float, buffer=v.buf) for v in shm_in.values()]
     indices = np.asarray(list(range(_arr_shape0)), dtype=int)
 
-    for i in range(_num_results):
-        np.random.shuffle(indices)
-        results_copy = [res[indices] for res in results_copy]
-        max_val = 0.0
-        for res in results_copy:
-            max_val = max(max_val, _test_sampling_impl_shared(res, _arr_shape1, _num_steps, _num_var_pers))
-        out_arr[i] = max_val
+    out_arr = _test_sampling_shared_(_results, indices, _num_results, _arr_shape1, _num_steps, _num_var_pers)
 
     shm_out_arr[_shm_out_idx:_shm_out_idx + _num_results] = out_arr[:]
     return True
@@ -349,121 +390,13 @@ def test_sampling_shared(_results: Dict[str, np.ndarray],
     return ecf_errs, iter_cur, err_curr
 
 
-def _test_sampling_impl_no_shared(_results: np.ndarray,
-                                  _num_times: int,
-                                  _num_steps: int,
-                                  _num_var_pers: int):
-    err_iter = 0.0
-    for idx in range(_num_times):
-        err_iter = max(err_iter, _ecf_err(_results[:, idx].T, _num_steps, _num_var_pers)[1])
-    return err_iter
-
-
-if consts.has_numba:
-    _test_sampling_impl_no_shared = numba.njit(_test_sampling_impl_no_shared)
-
-
-def _test_sampling_no_shared(_results: Dict[str, np.ndarray],
-                             _arr_shape0: int,
-                             _arr_shape1: int,
-                             _num_results: int,
-                             _num_steps: int,
-                             _num_var_pers: int):
-    # Ensure worker has unique seed
-    np.random.seed()
-
-    indices = np.asarray(list(range(_arr_shape0)), dtype=int)
-    result = []
-
-    for _ in range(_num_results):
-        np.random.shuffle(indices)
-        result.append(
-            max([_test_sampling_impl_no_shared(res[indices, :], _arr_shape1, _num_steps, _num_var_pers) for res in
-                 _results.values()]))
-
-    return result
-
-
-def test_sampling_no_shared(_results: Dict[str, np.ndarray],
-                            incr_sampling=100,
-                            err_thresh=1E-4,
-                            max_sampling: int = None,
-                            num_steps: int = consts.DEF_EVAL_NUM,
-                            num_var_pers: int = consts.DEF_NUM_VAR_PERS,
-                            num_workers: int = None):
-    var_names = list(_results.keys())
-
-    # Do stuff
-    sample_size, num_times = _results[var_names[0]].shape
-
-    ecf_errs = []
-
-    # Do initial work
-
-    if num_workers is None:
-        num_workers = mp.cpu_count()
-    num_workers = min(incr_sampling, num_workers)
-
-    num_jobs = [0 for _ in range(num_workers)]
-    jobs_left = int(incr_sampling)
-    while jobs_left > 0:
-        for i in range(num_workers):
-            if jobs_left > 0:
-                num_jobs[i] += 1
-                jobs_left -= 1
-    num_jobs = [n for n in num_jobs if n > 0]
-    num_workers = len(num_jobs)
-
-    if sum(num_jobs) != incr_sampling:
-        raise RuntimeError(f'Scheduled {sum(num_jobs)} jobs, though {incr_sampling} jobs were requested')
-
-    pool = par.get_pool()
-    if pool is None:
-        pool = mp.Pool(num_workers)
-
-    input_args = [(_results,
-                   sample_size,
-                   num_times,
-                   num_jobs[i],
-                   num_steps,
-                   num_var_pers)
-                  for i in range(num_workers)]
-
-    [ecf_errs.extend(res) for res in pool.starmap(_test_sampling_no_shared, input_args)]
-
-    # Do iterative work
-
-    ecf_err_avg_curr = np.average(ecf_errs)
-    iter_cur = 0
-    if ecf_err_avg_curr == 0:
-        err_curr = 0.0
-    else:
-        err_curr = err_thresh + 1.0
-    while err_curr >= err_thresh:
-        [ecf_errs.extend(res) for res in pool.starmap(_test_sampling_no_shared, input_args)]
-
-        ecf_err_avg_next = np.average(ecf_errs)
-        err_curr = abs(ecf_err_avg_next - ecf_err_avg_curr) / ecf_err_avg_curr
-
-        ecf_err_avg_curr = ecf_err_avg_next
-        if ecf_err_avg_curr == 0:
-            break
-
-        iter_cur += 1
-        if max_sampling is not None and len(ecf_errs) >= max_sampling:
-            break
-
-    return ecf_errs, iter_cur, err_curr
-
-
 def test_reproducibility(_results: Dict[str, np.ndarray],
                          incr_sampling=100,
                          err_thresh=1E-4,
                          max_sampling: int = None,
                          num_steps: int = consts.DEF_EVAL_NUM,
                          num_var_pers: int = consts.DEF_NUM_VAR_PERS,
-                         num_workers: int = None,
-                         shared: bool = False):
+                         num_workers: int = None):
     """
     Perform the test for reproducibility on a sample.
 
@@ -474,17 +407,11 @@ def test_reproducibility(_results: Dict[str, np.ndarray],
     :param num_steps: number of transform variable evaluations
     :param num_var_pers: number of parameterization periods of the empirical characteristic function
     :param num_workers: number of CPUs
-    :param shared: flag to use shared memory
     :return: error metric sample, number of iterations, final convergence value
     """
-    if shared:
-        return test_sampling_shared(
-            _results, incr_sampling, err_thresh, max_sampling, num_steps, num_var_pers, num_workers
-        )
-    else:
-        return test_sampling_no_shared(
-            _results, incr_sampling, err_thresh, max_sampling, num_steps, num_var_pers, num_workers
-        )
+    return test_sampling_shared(
+        _results, incr_sampling, err_thresh, max_sampling, num_steps, num_var_pers, num_workers
+    )
 
 
 def pvals(err_dist_mean: float, err_dist_stdev: float, err_compare: float, sample_size: int) -> float:
