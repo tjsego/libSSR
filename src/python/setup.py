@@ -1,7 +1,7 @@
 import os
 from setuptools import setup
 
-__version__ = open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+__version__ = open(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
                                 'VERSION.txt')).readline().strip()
 
 setup(
@@ -14,5 +14,5 @@ setup(
     install_requires=['numpy'],
     packages=['libssr'],
     package_dir={'libssr': 'libssr'},
-    package_data={'libssr': ['../../LICENSE', '../../VERSION.txt']}
+    package_data={'libssr': ['../../../LICENSE', '../../../VERSION.txt']}
 )
