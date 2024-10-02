@@ -49,13 +49,11 @@
             "type": "number"
         },
         "error_metric_stdev": {
-            "default": null,
             "minimum": 0.0,
             "title": "Error Metric Stdev",
             "type": "number"
         },
         "sig_figs": {
-            "default": null,
             "minimum": 1,
             "title": "Sig Figs",
             "type": "integer"
@@ -66,7 +64,9 @@
         "simulation_times",
         "ecf_evals",
         "ecf_tval",
-        "error_metric_mean"
+        "error_metric_mean",
+        "error_metric_stdev",
+        "sig_figs"
     ],
     "title": "SSRData",
     "type": "object"

@@ -13,14 +13,14 @@
 	<xs:element name="ssrdata">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element name="ssr_level" type="xs:positiveInteger"/>
-				<xs:element name="ssr_version" type="xs:positiveInteger"/>
+				<xs:element name="ssr_level" type="xs:positiveInteger" minOccurs="0"/>
+				<xs:element name="ssr_version" type="xs:positiveInteger" minOccurs="0"/>
 				<xs:element name="variable_names" type="xs:string"/>
 				<xs:element name="simulation_times" type="xs:string"/>
-				<xs:element name="sample_size" type="integerGe1"/>
+				<xs:element name="sample_size" type="integerGe1" minOccurs="0"/>
 				<xs:element name="ecf_evals" type="xs:string"/>
 				<xs:element name="ecf_tval" type="xs:string"/>
-				<xs:element name="ecf_nval" type="integerGe1"/>
+				<xs:element name="ecf_nval" type="integerGe1" minOccurs="0"/>
 				<xs:element name="error_metric_mean" type="xs:decimal"/>
 				<xs:element name="error_metric_stdev" type="decimalGe0"/>
 				<xs:element name="sig_figs" type="integerGe1"/>

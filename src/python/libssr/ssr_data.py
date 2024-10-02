@@ -18,9 +18,9 @@ from mkstd.types.array import get_array_type
 class SSRData(BaseModel):
     """Data standard for libSSR."""
 
-    ssr_level: int = Field(None, ge=0)
+    ssr_level: int = Field(default=None, ge=0)
     """SSR level"""
-    ssr_version: int = Field(None, ge=0)
+    ssr_version: int = Field(default=None, ge=0)
     """SSR version"""
 
     variable_names: list[str]
@@ -29,7 +29,7 @@ class SSRData(BaseModel):
         dtype=np.float64, dimensions=1, strict_dtype=True
     )
     """Simulation times"""
-    sample_size: int = Field(None, ge=1)
+    sample_size: int = Field(default=None, ge=1)
     """Sample size"""
 
     ecf_evals: get_array_type(
@@ -54,10 +54,10 @@ class SSRData(BaseModel):
 
     error_metric_mean: float
     """Error metric mean, from test for reproducibility"""
-    error_metric_stdev: float = Field(None, ge=0)
+    error_metric_stdev: float = Field(ge=0)
     """Error metric mean, from test for reproducibility"""
 
-    sig_figs: int = Field(None, ge=1)
+    sig_figs: int = Field(ge=1)
     """Significant figures of sample data"""
 
     @model_validator(mode="after")
