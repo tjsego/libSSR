@@ -132,7 +132,7 @@ xml_standard = XmlStandard(model=EFECTReport)
 xml_standard.save_schema("standards/schema.xsd")
 
 yaml_standard = YamlStandard(model=EFECTReport)
-yaml_standard.save_schema("standards/schema_yaml.json")
+yaml_standard.save_schema("standards/schema.yaml")
 
 # # Stage 2: use standards to validate/import/export data.
 # # Here, data are validated via `mkstd`. Third-party validators
