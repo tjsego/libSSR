@@ -13,5 +13,5 @@ setup(
     install_requires=['numpy', 'mkstd >= 0.0.4'],
     packages=['libssr'],
     package_dir={'libssr': 'libssr'},
-    package_data={'libssr': ['../../LICENSE', '../../VERSION.txt']}
+    package_data={'libssr': ['../../../LICENSE', '../../../VERSION.txt']}
 )
