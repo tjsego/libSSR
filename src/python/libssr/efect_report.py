@@ -11,17 +11,16 @@ from mkstd.standards import (
 )
 from mkstd.types.array import get_array_type
 
-
 # Stage 1: define a data model, then make standards from it.
 
 
-class SSRData(BaseModel):
-    """Data standard for libSSR."""
+class EFECTReport(BaseModel):
+    """Data standard for EFECT reports."""
 
-    ssr_level: int = Field(default=None, ge=0)
-    """SSR level"""
-    ssr_version: int = Field(default=None, ge=0)
-    """SSR version"""
+    efect_level: int = Field(default=None, ge=0)
+    """EFECT level"""
+    efect_version: int = Field(default=None, ge=0)
+    """EFECT version"""
 
     variable_names: list[str]
     """Variable names"""
@@ -61,7 +60,7 @@ class SSRData(BaseModel):
     """Significant figures of sample data"""
 
     @model_validator(mode="after")
-    def ensure_array_dimensions(self: SSRData) -> SSRData:
+    def ensure_array_dimensions(self: EFECTReport) -> EFECTReport:
         """Ensure that dependencies of array dimensions are satisfied."""
         # Keys are used in the expectation message.
         attr_measures = {
@@ -123,25 +122,25 @@ class SSRData(BaseModel):
         return self
 
 
-hdf5_standard = Hdf5Standard(model=SSRData)
+hdf5_standard = Hdf5Standard(model=EFECTReport)
 hdf5_standard.save_schema("standards/schema_hdf5.json")
 
-json_standard = JsonStandard(model=SSRData)
+json_standard = JsonStandard(model=EFECTReport)
 json_standard.save_schema("standards/schema.json")
 
-xml_standard = XmlStandard(model=SSRData)
+xml_standard = XmlStandard(model=EFECTReport)
 xml_standard.save_schema("standards/schema.xsd")
 
-yaml_standard = YamlStandard(model=SSRData)
+yaml_standard = YamlStandard(model=EFECTReport)
 yaml_standard.save_schema("standards/schema_yaml.json")
 
 # # Stage 2: use standards to validate/import/export data.
 # # Here, data are validated via `mkstd`. Third-party validators
 # # can also be used.
-# data = SSRData.parse_obj(
+# data = EFECTReport.parse_obj(
 #     {
-#         "ssr_level": 1,
-#         "ssr_version": 3,
+#         "efect_level": 1,
+#         "efect_version": 3,
 #         "variable_names": ["v1", "v2", "v3"],
 #         "simulation_times": np.linspace(0, 10, 4),
 #         "sample_size": 100000,
@@ -154,14 +153,14 @@ yaml_standard.save_schema("standards/schema_yaml.json")
 #     }
 # )
 # 
-# xml_standard.save_data(data=data, filename="output/data.xml")
-# data_xml = xml_standard.load_data(filename="output/data.xml")
+# xml_standard.save_data(data=data, filename="data/data.xml")
+# data_xml = xml_standard.load_data(filename="data/data.xml")
 # 
-# json_standard.save_data(data=data, filename="output/data.json")
-# data_json = json_standard.load_data(filename="output/data.json")
+# json_standard.save_data(data=data, filename="data/data.json")
+# data_json = json_standard.load_data(filename="data/data.json")
 # 
-# yaml_standard.save_data(data=data, filename="output/data.yaml")
-# data_yaml = yaml_standard.load_data(filename="output/data.yaml")
+# yaml_standard.save_data(data=data, filename="data/data.yaml")
+# data_yaml = yaml_standard.load_data(filename="data/data.yaml")
 # 
-# hdf5_standard.save_data(data=data, filename="output/data.hdf5")
-# data_hdf5 = hdf5_standard.load_data(filename="output/data.hdf5")
+# hdf5_standard.save_data(data=data, filename="data/data.hdf5")
+# data_hdf5 = hdf5_standard.load_data(filename="data/data.hdf5")

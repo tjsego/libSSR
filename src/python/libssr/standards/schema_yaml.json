@@ -1,16 +1,16 @@
 {
-    "description": "Data standard for libSSR.",
+    "description": "Data standard for EFECT reports.",
     "properties": {
-        "ssr_level": {
+        "efect_level": {
             "default": null,
             "minimum": 0,
-            "title": "Ssr Level",
+            "title": "Efect Level",
             "type": "integer"
         },
-        "ssr_version": {
+        "efect_version": {
             "default": null,
             "minimum": 0,
-            "title": "Ssr Version",
+            "title": "Efect Version",
             "type": "integer"
         },
         "variable_names": {
@@ -68,6 +68,6 @@
         "error_metric_stdev",
         "sig_figs"
     ],
-    "title": "SSRData",
+    "title": "EFECTReport",
     "type": "object"
 }
