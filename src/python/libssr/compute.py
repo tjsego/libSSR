@@ -1,7 +1,7 @@
 import multiprocessing as mp
 from multiprocessing import shared_memory
 import numpy as np
-from typing import Dict, List
+from typing import Dict, List, Union
 
 from . import consts
 from . import par
@@ -434,7 +434,7 @@ def pvals(err_dist_mean: float, err_dist_stdev: float, err_compare: float, sampl
     return min(1.0, pr)
 
 
-def pval(err_dist: np.ndarray, err_compare: float, sample_size: int) -> float:
+def pval(err_dist: Union[List[float], np.ndarray], err_compare: float) -> float:
     """
     Calculate the p-value of an error metric from comparison to another sample for an error metric distribution
     when testing a sample for reproducibility.
@@ -444,5 +444,10 @@ def pval(err_dist: np.ndarray, err_compare: float, sample_size: int) -> float:
     :param sample_size: size of the sample
     :return: p-value
     """
+    
+    if isinstance(err_dist, np.ndarray):
+        sz = err_dist.shape[0]
+    else:
+        sz = len(err_dist)
 
-    return pvals(np.average(err_dist), np.std(err_dist, ddof=1), err_compare, sample_size)
+    return pvals(float(np.average(err_dist)), float(np.std(err_dist, ddof=1)), err_compare, sz)
