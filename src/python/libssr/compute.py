@@ -6,6 +6,10 @@ from typing import Dict, List, Union
 from . import consts
 from . import par
 
+use_jax = False
+if consts.has_jax:
+    from . import jax_ssr
+    use_jax = True
 if consts.has_numba:
     import numba
 
@@ -409,6 +413,12 @@ def test_reproducibility(_results: Dict[str, np.ndarray],
     :param num_workers: number of CPUs
     :return: error metric sample, number of iterations, final convergence value
     """
+    global use_jax
+
+    if consts.has_jax and use_jax:
+        return jax_ssr.test_reproducibility(
+            _results, incr_sampling, err_thresh, max_sampling, num_steps, num_var_pers
+        )
     return test_sampling_shared(
         _results, incr_sampling, err_thresh, max_sampling, num_steps, num_var_pers, num_workers
     )

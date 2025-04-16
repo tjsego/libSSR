@@ -10,7 +10,8 @@ has_numba = False
 """Flag signifying whether numba is usable."""
 
 # Numba seems to only behave well on Windows
-if sys.platform.startswith('darwin') or sys.platform.startswith('linux'):
+# if sys.platform.startswith('darwin') or sys.platform.startswith('linux'):
+if False:
     pass
 else:
     try:
@@ -18,3 +19,9 @@ else:
         has_numba = True
     except ImportError:
         pass
+
+try:
+    import jax
+    has_jax = True
+except ImportError:
+    has_jax = False
