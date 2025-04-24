@@ -23,8 +23,6 @@
             <csymbol encoding="text" definitionURL="http://www.sbml.org/sbml/symbols/distrib/normal"> normal </csymbol>
             <cn type="integer"> 100 </cn>
             <cn type="integer"> 20 </cn>
-            <cn type="integer"> 0 </cn>
-            <cn type="integer"> 100000000 </cn>
           </apply>
         </math>
       </initialAssignment>
