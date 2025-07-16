@@ -1,0 +1,8 @@
+name: libssr-py-docs
+channels:
+  - conda-forge
+dependencies:
+  - python
+  - libssr-py
+  - sphinx
+  - sphinx_rtd_theme
