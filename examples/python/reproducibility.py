@@ -82,7 +82,7 @@ if __name__ == '__main__':
             my_ecf = libssr.ecf(my_samples[sz][:, i], eval_t)
             anothers_ecf = libssr.ecf(anothers_samples[sz][:, i], eval_t)
             error_metrics[sz] = max(error_metrics[sz], libssr.ecf_compare(my_ecf, anothers_ecf))
-        pvals[sz] = libssr.pvals(err_samples[sz], error_metrics[sz])
+        pvals[sz] = libssr.pval(err_samples[sz], error_metrics[sz])
 
     # Test against another sample from a different distribution
 
@@ -96,7 +96,7 @@ if __name__ == '__main__':
             my_ecf = libssr.ecf(my_samples[sz][:, i], eval_t)
             anothers_ecf = libssr.ecf(anothers_samples_different[sz][:, i], eval_t)
             error_metrics_different[sz] = max(error_metrics_different[sz], libssr.ecf_compare(my_ecf, anothers_ecf))
-        pvals_different[sz] = libssr.pvals(err_samples[sz], error_metrics_different[sz])
+        pvals_different[sz] = libssr.pval(err_samples[sz], error_metrics_different[sz])
 
     # Plot stuff
 

@@ -10,7 +10,16 @@ if consts.has_numba:
     import numba
 
 
-def get_eval_info_times(_eval_num: int, _eval_fin: float):
+def get_eval_info_times(_eval_num: int, _eval_fin: float) -> np.ndarray:
+    """
+    Get evenly distributed transform variable values from zero to a given final value.
+
+    A simple wrap of NumPy's linspace.
+
+    :param _eval_num: number of values
+    :param _eval_fin: final value
+    :return: transform variable values
+    """
     return np.linspace(0.0, _eval_fin, _eval_num)
 
 
@@ -18,13 +27,13 @@ if consts.has_numba:
     get_eval_info_times = numba.njit(get_eval_info_times)
 
 
-def eval_final(sample: np.ndarray, num_var_pers=consts.DEF_NUM_VAR_PERS):
+def eval_final(sample: np.ndarray, num_var_pers=consts.DEF_NUM_VAR_PERS) -> float:
     """
     Get the parameterized final transform variable value for evaluating an empirical characteristic function
 
     :param sample: sample to which to parameterize
     :param num_var_pers: number of parameterization periods of the empirical characteristic function
-    :return:
+    :return: final transform variable value
     """
     v_stdev = np.std(sample)
     return 1.0 if v_stdev == 0 else 2 * num_var_pers * np.pi / v_stdev
@@ -441,7 +450,6 @@ def pval(err_dist: Union[List[float], np.ndarray], err_compare: float) -> float:
 
     :param err_dist: distribution of the error metric when testing for reproducibility
     :param err_compare: error metric when comparing to another sample
-    :param sample_size: size of the sample
     :return: p-value
     """
     
