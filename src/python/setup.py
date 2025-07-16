@@ -10,7 +10,7 @@ setup(
     author="T.J. Sego",
     author_email="timothy.sego@medicine.ufl.edu",
     python_requires='>=3.8',
-    install_requires=['numpy', 'mkstd[numpyv1] >= 0.0.5'],
+    install_requires=['numpy', 'mkstd >= 0.0.5'],
     packages=['libssr'],
     package_dir={'libssr': 'libssr'},
     package_data={'libssr': ['../../../LICENSE', '../../../VERSION.txt']}
