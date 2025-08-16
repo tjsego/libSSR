@@ -1,4 +1,3 @@
-# libSSR
 ## Library for Stochastic Simulation Reproducibility
 
 libSSR is an open-source software library designed to enhance the reproducibility of stochastic simulations.
@@ -24,3 +23,5 @@ The libSSR Python package is also available for installation via conda:
 ```
 conda install -c conda-forge libssr-py
 ```
+=======
+Library for Stochastic Simulation Reproducibility
