@@ -1,4 +1,10 @@
-## Library for Stochastic Simulation Reproducibility
+===============
+ LibSSR Python
+===============
+
+---------------------------------------------------------------
+ A Library for Stochastic Simulation Reproducibility in Python
+---------------------------------------------------------------
 
 libSSR is an open-source software library designed to enhance the reproducibility of stochastic simulations.
 libSSR provides tools that help researchers and developers ensure that their stochastic models yield
@@ -10,18 +16,35 @@ where randomness plays a central role. libSSR provides features to accomplish th
 * Packaging encoded results and metadata to facilitate information exchange allowing reproducibility studies at scale.
 * Statistical testing of whether a given sample of stochastic simulation results matches those encoded in packaged data.
 
-## Installation
+Installation
+=============
 
 The libSSR Python package is available for installation via pip:
 
-```
-pip install libssr
-```
+.. code-block:: bash
+
+    pip install libssr
 
 The libSSR Python package is also available for installation via conda:
 
-```
-conda install -c conda-forge libssr-py
-```
-=======
-Library for Stochastic Simulation Reproducibility
+.. code-block:: bash
+
+    conda install -c conda-forge libssr-py
+
+Citation
+=========
+
+libSSR is based on the Empirical Characteristic Function Equality Convergence Test (EFECT).
+To use libSSR in research, please cite the publication that describes EFECT:
+
+    Sego, T. J., et al. "EFECT--A Method and Metric to Assess the Reproducibility of Stochastic Simulation Studies." arXiv preprint arXiv:2406.16820 (2024).
+
+.. toctree::
+    :maxdepth: 1
+
+    comparison_wfs
+    packaging
+    simulators
+    notes
+    api/index
+    history

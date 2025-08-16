@@ -1,0 +1,57 @@
+description: Data standard for EFECT reports.
+properties:
+  efect_level:
+    default: null
+    minimum: 0
+    title: Efect Level
+    type: integer
+  efect_version:
+    default: null
+    minimum: 0
+    title: Efect Version
+    type: integer
+  variable_names:
+    items:
+      type: string
+    title: Variable Names
+    type: array
+  simulation_times:
+    title: Simulation Times
+    type: array
+  sample_size:
+    default: null
+    minimum: 1
+    title: Sample Size
+    type: integer
+  ecf_evals:
+    title: Ecf Evals
+    type: array
+  ecf_tval:
+    title: Ecf Tval
+    type: array
+  ecf_nval:
+    default: null
+    minimum: 1
+    title: Ecf Nval
+    type: integer
+  error_metric_mean:
+    title: Error Metric Mean
+    type: number
+  error_metric_stdev:
+    minimum: 0.0
+    title: Error Metric Stdev
+    type: number
+  sig_figs:
+    minimum: 1
+    title: Sig Figs
+    type: integer
+required:
+- variable_names
+- simulation_times
+- ecf_evals
+- ecf_tval
+- error_metric_mean
+- error_metric_stdev
+- sig_figs
+title: EFECTReport
+type: object
