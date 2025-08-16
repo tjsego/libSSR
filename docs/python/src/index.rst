@@ -14,18 +14,18 @@ where randomness plays a central role. libSSR provides features to accomplish th
 
 * Quantifying how well others can reproduce a given sample of stochastic simulation results.
 * Packaging encoded results and metadata to facilitate information exchange allowing reproducibility studies at scale.
-* Testing whether a given sample of stochastic simulation results matches those encoded in packaged data.
+* Statistical testing of whether a given sample of stochastic simulation results matches those encoded in packaged data.
 
 Installation
 =============
 
-libSSR is available for installation via pip:
+The libSSR Python package is available for installation via pip:
 
 .. code-block:: bash
 
     pip install libssr
 
-libSSR is also available for installation via conda:
+The libSSR Python package is also available for installation via conda:
 
 .. code-block:: bash
 

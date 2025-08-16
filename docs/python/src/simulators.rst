@@ -48,5 +48,5 @@ that can be used with other implementations to automate reproducibility tests li
     sample_size = 1000
     results = [sim.produce_results(model_names, results_times, sample_size) for sim in sims]
     # Test reproducibility
-    err_samples = [libssr.test_reproducibility(res)[0] for res in results]
+    err_samples = [libssr.sample_efect_error(res)[0] for res in results]
     # Continue to EFECT Report generation and simulator comparison...

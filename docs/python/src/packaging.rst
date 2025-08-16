@@ -45,7 +45,7 @@ can be generated using libSSR functions:
 
     # Perform the Test for Reproducibility
     eval_num = 101
-    err_sample = libssr.test_reproducibility(sample, num_steps=eval_num)[0]
+    err_sample = libssr.sample_efect_error(sample, num_steps=eval_num)[0]
 
     # Insert some evaluation of the EFECT Error distribution to determine
     # whether the sample is sufficiently reproducible
@@ -97,7 +97,7 @@ Exported data can be reloaded for testing against other stochastic simulation re
                                        sdata.sig_figs)
         for n in sdata.variable_names
     }
-    err_sample2 = libssr.test_reproducibility(sample2, num_steps=sdata.ecf_nval)[0]
+    err_sample2 = libssr.sample_efect_error(sample2, num_steps=sdata.ecf_nval)[0]
     # Compute the EFECT Error comparing this sample to the sample encoded in the EFECT Report
     err_max = 0.0
     for i in range(sdata.simulation_times.shape[0]):

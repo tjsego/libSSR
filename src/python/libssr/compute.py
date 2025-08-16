@@ -2,6 +2,7 @@ import multiprocessing as mp
 from multiprocessing import shared_memory
 import numpy as np
 from typing import Dict, List, Union
+import warnings
 
 from . import consts
 from . import par
@@ -408,6 +409,38 @@ def test_reproducibility(_results: Dict[str, np.ndarray],
                          num_workers: int = None):
     """
     Perform the test for reproducibility on a sample.
+
+    .. deprecated:: 0.0.0
+        Use :func:`sample_efect_error: instead.
+
+    :param _results: trajectories by name; dim 0 is by realization; dim 1 is by time
+    :param incr_sampling: number of additional trajectories when increasing sample size
+    :param err_thresh: convergence criterion
+    :param max_sampling: maximum error metric sample size
+    :param num_steps: number of transform variable evaluations
+    :param num_var_pers: number of parameterization periods of the empirical characteristic function
+    :param num_workers: number of CPUs
+    :return: error metric sample, number of iterations, final convergence value
+    """
+    warnings.warn(
+        '`test_reproducibility` has been deprecated. Use `sample_efect_error` instead.',
+        DeprecationWarning
+    )
+
+    return sample_efect_error(
+        _results, incr_sampling, err_thresh, max_sampling, num_steps, num_var_pers, num_workers
+    )
+
+
+def sample_efect_error(_results: Dict[str, np.ndarray],
+                       incr_sampling=100,
+                       err_thresh=1E-4,
+                       max_sampling: int = None,
+                       num_steps: int = consts.DEF_EVAL_NUM,
+                       num_var_pers: int = consts.DEF_NUM_VAR_PERS,
+                       num_workers: int = None):
+    """
+    Sample the EFECT Error by performing the Test for Reproducibility on a sample.
 
     :param _results: trajectories by name; dim 0 is by realization; dim 1 is by time
     :param incr_sampling: number of additional trajectories when increasing sample size

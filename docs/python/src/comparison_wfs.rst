@@ -57,7 +57,7 @@ basis of EFECT:
     var_name = 'Y'  # Variable name
     eval_num = 101  # Number of transform variable evaluations
     # Only capture EFECT Error sampling
-    err_sample = libssr.test_reproducibility({var_name: sample}, num_steps=eval_num)[0]
+    err_sample = libssr.sample_efect_error({var_name: sample}, num_steps=eval_num)[0]
 
 The returned EFECT Error sample from the Test for Reproducibility can be used to test the
 hypothesis that the tested sample and another sample are realizations of the

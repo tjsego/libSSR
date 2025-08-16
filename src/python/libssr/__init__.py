@@ -5,6 +5,7 @@ from .compute import (get_eval_info_times,
                       eval_final,
                       find_ecfs,
                       test_reproducibility,
+                      sample_efect_error,
                       pval,
                       pvals)
 from .data import EFECTReport

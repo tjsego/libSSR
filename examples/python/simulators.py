@@ -78,7 +78,7 @@ if __name__ == '__main__':
 
     # Test reproducibility
 
-    err_samples = [libssr.test_reproducibility(res)[0] for res in results]
+    err_samples = [libssr.sample_efect_error(res)[0] for res in results]
 
     fig, ax = plt.subplots(1, 1, layout='compressed', figsize=(5.0, 4.0))
     for sim_name, res in zip(sim_labels, err_samples):

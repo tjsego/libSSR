@@ -22,6 +22,8 @@ LibSSR Python API
 
 .. autofunction:: test_reproducibility
 
+.. autofunction:: sample_efect_error
+
 .. autofunction:: pval
 
 .. autofunction:: pvals

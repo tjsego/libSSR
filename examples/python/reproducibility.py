@@ -38,7 +38,7 @@ if __name__ == '__main__':
 
     # Test for reproducibility
 
-    err_samples = {sz: libssr.test_reproducibility({var_name: samples[sz]})[0] for sz in sizes_tested}
+    err_samples = {sz: libssr.sample_efect_error({var_name: samples[sz]})[0] for sz in sizes_tested}
     err_means = {sz: np.mean(err_samples[sz]) for sz in sizes_tested}
     err_stdevs = {sz: np.std(err_samples[sz]) for sz in sizes_tested}
     
