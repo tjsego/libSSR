@@ -7,6 +7,8 @@ import warnings
 from . import consts
 from . import par
 
+if consts.has_mlx:
+    from . import compute_mlx
 if consts.has_numba:
     import numba
 
@@ -451,6 +453,8 @@ def sample_efect_error(_results: Dict[str, np.ndarray],
     :param num_workers: number of CPUs
     :return: error metric sample, number of iterations, final convergence value
     """
+    if consts.has_mlx:
+        return compute_mlx.test_sampling(_results, incr_sampling, err_thresh, max_sampling, num_steps, num_var_pers)
     return test_sampling_shared(
         _results, incr_sampling, err_thresh, max_sampling, num_steps, num_var_pers, num_workers
     )

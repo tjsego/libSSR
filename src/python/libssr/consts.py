@@ -18,8 +18,9 @@ if 'LIBSSR_NO_NUMBA' not in os.environ:
         has_numba = True
     except ImportError:
         pass
-try:
-    import mlx
-    has_mlx = True
-except ImportError:
-    pass
+if 'LIBSSR_NO_MLX' not in os.environ:
+    try:
+        import mlx
+        has_mlx = True
+    except ImportError:
+        pass
