@@ -1,8 +1,13 @@
 from __future__ import annotations
 
 import numpy as np
-from pydantic import BaseModel, Field, model_validator
 
+try:
+    import mkstd
+except ImportError:
+    raise ImportError(
+        'The package mkstd is not installed. mkstd is available via pip with the command "pip install mkstd"'
+    )
 from mkstd.standards import (
     Hdf5Standard,
     JsonStandard,
@@ -10,6 +15,7 @@ from mkstd.standards import (
     YamlStandard,
 )
 from mkstd.types.array import get_array_type
+from pydantic import BaseModel, Field, model_validator
 
 # Stage 1: define a data model, then make standards from it.
 

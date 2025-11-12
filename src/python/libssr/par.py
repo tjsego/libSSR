@@ -33,6 +33,6 @@ def get_pool():
 
 
 def close_pool():
-    """CLose the module pool (if any)"""
+    """Close the module pool (if any)"""
     global lib_pool
     lib_pool = None

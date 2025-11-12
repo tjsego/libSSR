@@ -1,3 +1,5 @@
+import os
+
 DEF_EVAL_NUM = 100
 """Default number of transform variable evaluations"""
 
@@ -10,11 +12,12 @@ has_numba = False
 has_mlx = False
 """Flag signifying whether mlx is usable"""
 
-try:
-    import numba
-    has_numba = True
-except ImportError:
-    pass
+if 'LIBSSR_NO_NUMBA' not in os.environ:
+    try:
+        import numba
+        has_numba = True
+    except ImportError:
+        pass
 try:
     import mlx
     has_mlx = True
