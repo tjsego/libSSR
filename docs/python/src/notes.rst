@@ -3,6 +3,16 @@
 Notes
 ======
 
+Code Acceleration with MLX
+--------------------------
+
+libSSR will accelerate computations on Apple Silicon
+if the `mlx <https://ml-explore.github.io/mlx/build/html/index.html/>`_
+package is installed.
+Acceleration via MLX can be disabled by
+setting the environment variable ``LIBSSR_NO_MLX`` before
+first import of libSSR.
+
 Code Acceleration with Numba JIT Compilation
 ---------------------------------------------
 
